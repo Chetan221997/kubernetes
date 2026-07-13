@@ -1,0 +1,35 @@
+namespace: day5
+
+image:
+  repository: nginx
+  tag: "1.27"
+  pullPolicy: IfNotPresent
+
+replicaCount: 2
+
+payments:
+  name: payments
+  message: Payments Service
+
+orders:
+  name: orders
+  message: Orders Service
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  host: day5.local
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+
+probes:
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+  liveness:
+    initialDelaySeconds: 15
+    periodSeconds: 20

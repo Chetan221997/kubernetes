@@ -1,0 +1,6 @@
+apiVersion: v2
+name: day5-ecommerce
+description: Day 5 Kubernetes project for replicas, ingress, probes, and Helm
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

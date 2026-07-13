@@ -1,0 +1,13 @@
+Day 5 ecommerce project installed.
+
+Namespace:
+  {{ .Values.namespace }}
+
+Ingress host:
+  http://{{ .Values.ingress.host }}/payments
+  http://{{ .Values.ingress.host }}/orders
+
+Useful commands:
+  kubectl get all -n {{ .Values.namespace }}
+  kubectl get ingress -n {{ .Values.namespace }}
+  helm history {{ .Release.Name }}

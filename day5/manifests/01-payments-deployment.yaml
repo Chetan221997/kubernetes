@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payments
+  namespace: day5
+  labels:
+    app: payments
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: payments
+  template:
+    metadata:
+      labels:
+        app: payments
+        tier: backend
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo '<h1>Payments Service</h1><p>Day 5 Kubernetes project</p>' > /usr/share/nginx/html/index.html
+              nginx -g 'daemon off;'
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 20
