@@ -287,14 +287,6 @@ Common Ingress controllers:
 - AWS Load Balancer Controller
 - Azure Application Gateway Ingress Controller
 
-Correction for class:
-
-```text
-Do not say Kubernetes supports only GCE and NGINX.
-Ingress is controller-based. You choose and install an Ingress controller.
-For Minikube practicals, the common choice is the NGINX Ingress addon.
-```
-
 Kubernetes Ingress API status:
 
 ```text
