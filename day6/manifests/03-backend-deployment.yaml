@@ -1,0 +1,32 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: day6
+  labels:
+    app: backend
+    tier: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: api
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.27
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              echo '<h1>Backend API</h1><p>Reached through ClusterIP Service DNS</p>' > /usr/share/nginx/html/index.html
+              nginx -g 'daemon off;'
+          ports:
+            - name: http
+              containerPort: 80

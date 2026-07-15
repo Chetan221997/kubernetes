@@ -1,0 +1,13 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: day7
+data:
+  APP_MODE: "dev"
+  LOG_LEVEL: "info"
+  WELCOME_MESSAGE: "Welcome to Day 7 Kubernetes configuration lab"
+  app.properties: |
+    app.name=config-storage-demo
+    app.environment=dev
+    app.owner=platform-team

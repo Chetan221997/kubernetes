@@ -1,11 +1,11 @@
-﻿# Kubernetes Zero To Hero - 7 Day Roadmap
+# Kubernetes Zero To Hero - 7 Day Roadmap
 
 This document defines a practical Kubernetes learning plan. Each day includes theory, commands, YAML manifests, troubleshooting, and a concrete lab outcome.
 
 ## Method
 
 ```text
-Concept ---> Architecture ---> YAML ---> Commands ---> Validation ---> Troubleshooting ---> Interview Review
+Concept -> Architecture -> YAML -> Commands -> Validation -> Troubleshooting -> Interview Review
 ```
 
 ## Lab Environment
@@ -19,26 +19,26 @@ Concept ---> Architecture ---> YAML ---> Commands ---> Validation ---> Troublesh
 ## Core Kubernetes Flow
 
 ```text
-kubectl ---> kube-api-server ---> scheduler/controller ---> kubelet ---> container runtime ---> pod
+kubectl -> kube-api-server -> scheduler/controller -> kubelet -> container runtime -> pod
 ```
 
 ## Day 1 - Architecture, Setup, Namespace, Pod
 
 Focus:
 
-- Kubernetes purpose and architecture
-- Control plane components
-- Worker node components
-- Minikube setup
-- Namespace basics
-- First pod manifest
+- Kubernetes purpose and architecture.
+- Control plane components.
+- Worker node components.
+- Minikube setup.
+- Namespace basics.
+- First Pod manifest.
 
 Practical outcome:
 
 - Start a local Minikube cluster.
 - Create the `day1` namespace.
 - Deploy `nginx-pod` using `day1/nginx-pod.yaml`.
-- Inspect pod status, events, logs, and container command execution.
+- Inspect Pod status, events, logs, and container command execution.
 
 Detailed module: [day1/README.md](day1/README.md)
 
@@ -46,10 +46,10 @@ Detailed module: [day1/README.md](day1/README.md)
 
 Focus:
 
-- Kubernetes manifest structure
-- Labels and selectors
-- ReplicaSet behavior
-- Deployment rollouts and rollback
+- Kubernetes manifest structure.
+- Labels and selectors.
+- ReplicaSet behavior.
+- Deployment rollouts and rollback.
 
 Practical outcome:
 
@@ -163,63 +163,149 @@ helm uninstall day5-web -n day5
 
 Detailed module: [day5/README.md](day5/README.md)
 
-## Day 6 - ConfigMaps, Secrets, Storage, And Debugging
+## Day 6 - Kubernetes Networking
 
 Focus:
 
-- Externalizing configuration.
-- Handling sensitive values.
-- Environment variable injection.
-- Volumes and PersistentVolumeClaims.
-- Common Pod failure states.
-- Debugging with logs, describe, events, and exec.
+- Kubernetes networking meaning and purpose.
+- Container-to-container communication inside one Pod.
+- Pod-to-Pod communication.
+- Pod-to-Service communication.
+- Service DNS and CoreDNS.
+- ClusterIP, NodePort, LoadBalancer, and ExternalName Services.
+- Ingress traffic and egress traffic.
+- Cluster networking with CNI plugins.
+- Common CNI plugins: Flannel, Calico, Weave Net, and Cilium.
+- Pod CIDR, Service CIDR, node IPs, Pod IPs, and Service IPs.
+- NetworkPolicy behavior using Calico on Minikube.
+- Networking troubleshooting using `get`, `describe`, `exec`, `nslookup`, `wget`, and events.
 
 Practical outcome:
 
-- Create a ConfigMap.
-- Create a Secret.
-- Inject both into a workload.
-- Mount a volume for persistent data.
-- Break and debug a workload intentionally.
+- Start Minikube with Calico CNI.
+- Deploy frontend and backend workloads.
+- Expose frontend using NodePort.
+- Expose backend using ClusterIP.
+- Test backend DNS from a client Pod.
+- Test ExternalName DNS behavior.
+- Inspect Pod IPs, Service IPs, and node IPs.
+- Apply an egress deny NetworkPolicy.
+- Apply an allow policy for DNS and backend traffic.
+- Debug common Service, DNS, NodePort, and policy issues.
 
 Key commands:
 
 ```powershell
-kubectl create namespace day6
-kubectl create configmap app-config --from-literal=APP_MODE=dev -n day6
-kubectl create secret generic app-secret --from-literal=DB_PASSWORD=admin123 -n day6
-kubectl apply -f day6/config-demo.yaml
-kubectl describe pod <pod-name> -n day6
-kubectl logs <pod-name> -n day6
-kubectl get events -n day6 --sort-by=.metadata.creationTimestamp
-kubectl exec -it <pod-name> -n day6 -- sh
+minikube delete
+minikube start --driver=docker --cni=calico
+kubectl cluster-info
+kubectl get pods -n kube-system
+kubectl apply -f day6/manifests/00-namespace.yaml
+kubectl apply -f day6/manifests/01-frontend-deployment.yaml
+kubectl apply -f day6/manifests/02-frontend-nodeport-service.yaml
+kubectl apply -f day6/manifests/03-backend-deployment.yaml
+kubectl apply -f day6/manifests/04-backend-clusterip-service.yaml
+kubectl apply -f day6/manifests/05-externalname-service.yaml
+kubectl apply -f day6/manifests/06-network-client-pod.yaml
+kubectl get pods -n day6 -o wide
+kubectl get svc -n day6
+kubectl exec -n day6 network-client -- nslookup backend-service.day6.svc.cluster.local
+kubectl exec -n day6 network-client -- wget -qO- http://backend-service
+kubectl exec -n day6 network-client -- nslookup external-api.day6.svc.cluster.local
+minikube service frontend-nodeport -n day6 --url
+kubectl apply -f day6/manifests/07-deny-egress-networkpolicy.yaml
+kubectl apply -f day6/manifests/08-allow-dns-and-backend-egress.yaml
+kubectl get networkpolicy -n day6
+kubectl delete namespace day6 --ignore-not-found=true
+minikube stop
 ```
 
-## Day 7 - Final Project And Production Review
+Detailed module: [day6/README.md](day6/README.md)
+
+## Day 7 - ConfigMaps, Secrets, Storage, And Debugging
 
 Focus:
 
-- Review architecture.
-- Review workloads and Services.
-- Review Ingress and probes.
-- Review Helm packaging.
-- Production readiness checklist.
-- Final Kubernetes project.
+- ConfigMaps for non-sensitive application configuration.
+- Secrets for sensitive application configuration.
+- Environment variable injection from ConfigMaps and Secrets.
+- Mounting ConfigMaps and Secrets as files.
+- Storage basics: volumes, `emptyDir`, PersistentVolume, PersistentVolumeClaim, StorageClass, and CSI drivers.
+- PVC-based storage for application data.
+- Temporary shared storage using `emptyDir`.
+- Common Kubernetes errors and how to debug them.
+- Debug flow: status, describe, logs, previous logs, events, exec, YAML inspection, and resource checks.
 
 Practical outcome:
 
-- Build a final Kubernetes application from scratch.
-- Package it with Helm.
-- Validate Services, Ingress, probes, and rollback.
-- Review interview questions from Day 1 to Day 7.
+- Create a ConfigMap with application settings.
+- Create a Secret using `stringData`.
+- Create a PersistentVolumeClaim.
+- Deploy a workload that consumes ConfigMap, Secret, and PVC data.
+- Mount ConfigMap and Secret values as files.
+- Use `emptyDir` between two containers in one Pod.
+- Run controlled debugging examples for common error states.
+- Understand how to read Kubernetes events and failure messages.
+
+Common errors covered:
+
+- `ImagePullBackOff` and `ErrImagePull`.
+- `CrashLoopBackOff`.
+- `CreateContainerConfigError`.
+- `Pending` Pod due to storage or scheduling issues.
+- `ContainerCreating` stuck.
+- `OOMKilled`.
+- Readiness probe failures.
+- Service with no endpoints.
+- `Forbidden` RBAC errors.
+- YAML validation errors.
 
 Key commands:
 
 ```powershell
-helm template final-app ./final-app
-helm install final-app ./final-app
-helm upgrade final-app ./final-app
-helm history final-app
-helm rollback final-app 1
-helm uninstall final-app
+minikube start --driver=docker
+kubectl apply -f day7/manifests/00-namespace.yaml
+kubectl apply -f day7/manifests/01-configmap.yaml
+kubectl apply -f day7/manifests/02-secret.yaml
+kubectl apply -f day7/manifests/03-pvc.yaml
+kubectl apply -f day7/manifests/04-config-secret-storage-deployment.yaml
+kubectl apply -f day7/manifests/05-emptydir-pod.yaml
+kubectl get all -n day7
+kubectl get pvc -n day7
+kubectl describe pod -n day7 -l app=config-storage-demo
+kubectl logs -n day7 -l app=config-storage-demo
+kubectl exec -n day7 deploy/config-storage-demo -- printenv APP_MODE
+kubectl exec -n day7 deploy/config-storage-demo -- cat /etc/app-config/app.properties
+kubectl exec -n day7 deploy/config-storage-demo -- cat /data/status.txt
+kubectl logs emptydir-demo -n day7 -c reader
 ```
+
+Debug examples:
+
+```powershell
+kubectl apply -f day7/debug/01-imagepullbackoff.yaml
+kubectl describe pod imagepull-error-demo -n day7
+kubectl get events -n day7 --sort-by=.metadata.creationTimestamp
+kubectl delete -f day7/debug/01-imagepullbackoff.yaml
+
+kubectl apply -f day7/debug/02-crashloopbackoff.yaml
+kubectl logs crashloop-demo -n day7 --previous
+kubectl delete -f day7/debug/02-crashloopbackoff.yaml
+
+kubectl apply -f day7/debug/03-createcontainerconfigerror.yaml
+kubectl describe pod missing-secret-demo -n day7
+kubectl delete -f day7/debug/03-createcontainerconfigerror.yaml
+```
+
+Cleanup:
+
+```powershell
+kubectl delete namespace day7 --ignore-not-found=true
+minikube stop
+```
+
+Detailed module: [day7/README.md](day7/README.md)
+
+
+
+

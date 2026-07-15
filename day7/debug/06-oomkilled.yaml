@@ -1,0 +1,20 @@
+﻿apiVersion: v1
+kind: Pod
+metadata:
+  name: oomkilled-demo
+  namespace: day7
+spec:
+  restartPolicy: Always
+  containers:
+    - name: memory-demo
+      image: python:3.12-alpine
+      command:
+        - python
+        - -c
+      args:
+        - "x=[]\nwhile True:\n    x.append('x' * 1024 * 1024)"
+      resources:
+        limits:
+          memory: 32Mi
+        requests:
+          memory: 16Mi
