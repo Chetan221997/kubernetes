@@ -1,14 +1,10 @@
-Create a Namespace
-
 Create the namespace:
-
-kubectl create namespace day3
+Command: kubectl create namespace day3
 
 Set it as the current namespace:
-
-kubectl config set-context --current --namespace=day3
+Cammand: kubectl config set-context --current --namespace=day3
 
 Verify:
+Command: kubectl get namespaces
 
-kubectl get namespaces
 
