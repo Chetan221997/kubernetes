@@ -107,30 +107,37 @@ frontend-prod-pod    1/1     Running   app=ecommerce,environment=prod,tier=front
 
 Step 9: Equality-Based Label Selectors
 
-Development Pods
+Development Pods:
+
 kubectl get pods -l environment=dev
 
-Frontend Pods
+Frontend Pods:
+
 kubectl get pods -l tier=frontend
 
-Development Backend Pod
+Development Backend Pod:
+
 kubectl get pods -l environment=dev,tier=backend
 
-Pods That Are Not Production
+Pods That Are Not Production:
+
 kubectl get pods -l environment!=prod
 
 Step 10: Set-Based Label Selectors
 
-Show Dev and Prod Pods
+Show Dev and Prod Pods:
+
 kubectl get pods -l "environment in (dev,prod)"
 
-Exclude Backend Pods
+Exclude Backend Pods:
+
 kubectl get pods -l "tier notin (backend)"
 
-Show Only Production Frontend Pod
+Show Only Production Frontend Pod:
+
 kubectl get pods -l "environment in (prod),tier in (frontend)"
 
-Step 11: Verify Namespace (Optional)
+Step 11: Verify Namespace (Optional):
 
 kubectl get all
 
